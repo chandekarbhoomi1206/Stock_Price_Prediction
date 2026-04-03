@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indian Stock Prediction Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Indian Stock Learning Project</p>
+          <h1>Indian Stock Price Prediction</h1>
+          <p class="hero-text">
+            Explore Indian stock data from Yahoo Finance, compare moving averages,
+            and generate a simple future-date prediction with explainable features in rupees.
+          </p>
+          <div class="hero-badges">
+            <span>Interactive chart</span>
+            <span>Future date forecast</span>
+            <span>Indian tickers</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <form id="prediction-form" class="controls">
+            <label>
+              Stock ticker
+              <div class="ticker-picker">
+                <div class="ticker-input-row">
+                  <input
+                    id="ticker-input"
+                    name="ticker"
+                    value="RELIANCE.NS"
+                    placeholder="Search Indian ticker"
+                    maxlength="20"
+                    autocomplete="off"
+                  />
+                  <button type="button" id="toggle-ticker-list" class="secondary-button">Show all</button>
+                </div>
+                <div id="ticker-dropdown" class="ticker-dropdown hidden">
+                  <div id="ticker-results" class="ticker-results"></div>
+                </div>
+              </div>
+              <small class="field-help">Search from the Indian company list or open the full ticker list. You can still type any Yahoo Finance symbol manually.</small>
+            </label>
+            <label>
+              History period
+              <select id="period-select" name="period">
+                <option value="6mo">6 months</option>
+                <option value="1y" selected>1 year</option>
+                <option value="2y">2 years</option>
+                <option value="5y">5 years</option>
+              </select>
+            </label>
+            <label>
+              Prediction target date
+              <input id="target-date-input" name="target_date" type="date" />
+              <small class="field-help">Choose a future date and the app will estimate the move by that trading day. Range is limited to 30 trading sessions.</small>
+            </label>
+            <button type="submit">Run prediction</button>
+          </form>
+          <p id="status-text" class="status-text">Loading RELIANCE.NS market data...</p>
+        </div>
+      </section>
+
+      <section class="dashboard">
+        <article class="summary-panel">
+          <div class="panel-heading">
+            <p class="panel-label">Current View</p>
+            <h2 id="company-name">Reliance Industries Limited</h2>
+            <p id="ticker-pill" class="ticker-pill">RELIANCE.NS</p>
+          </div>
+          <div class="metric-grid">
+            <div class="metric-card">
+              <span>Latest close</span>
+              <strong id="last-close">--</strong>
+            </div>
+            <div class="metric-card accent">
+              <span>Predicted close</span>
+              <strong id="pred-close">--</strong>
+            </div>
+            <div class="metric-card">
+              <span>Predicted move %</span>
+              <strong id="pred-change">--</strong>
+            </div>
+            <div class="metric-card">
+              <span>RSI (14)</span>
+              <strong id="rsi-value">--</strong>
+            </div>
+          </div>
+          <div class="live-strip">
+            <div class="pulse-dot"></div>
+            <span id="forecast-window">Forecasting the next trading session</span>
+          </div>
+          <p class="meta-line">
+            <span id="target-date-label">--</span>
+            <span class="meta-sep">|</span>
+            <span id="source-chip">Source: --</span>
+          </p>
+          <div class="insights">
+            <h3>Model notes</h3>
+            <ul id="insight-list"></ul>
+          </div>
+        </article>
+
+        <article class="chart-panel">
+          <div class="panel-heading inline">
+            <div>
+              <p class="panel-label">Interactive Chart</p>
+              <h2>Price vs Moving Averages</h2>
+            </div>
+            <div class="legend">
+              <span class="legend-dot close"></span> Close
+              <span class="legend-dot ma7"></span> 7-Day MA
+              <span class="legend-dot ma21"></span> 21-Day MA
+              <span class="legend-dot pred"></span> Prediction
+            </div>
+          </div>
+          <canvas id="price-chart"></canvas>
+        </article>
+
+        <article class="metrics-panel">
+          <div class="panel-heading">
+            <p class="panel-label">Learning Metrics</p>
+            <h2>How the model performed</h2>
+          </div>
+          <div class="metric-grid compact">
+            <div class="metric-card">
+              <span>MAE</span>
+              <strong id="mae-value">--</strong>
+            </div>
+            <div class="metric-card">
+              <span>R2 score</span>
+              <strong id="r2-value">--</strong>
+            </div>
+            <div class="metric-card">
+              <span>Train rows</span>
+              <strong id="train-size">--</strong>
+            </div>
+            <div class="metric-card">
+              <span>Test rows</span>
+              <strong id="test-size">--</strong>
+            </div>
+          </div>
+          <div class="prediction-band">
+            <p class="panel-label">Prediction band</p>
+            <p id="prediction-band-value" class="band-value">--</p>
+          </div>
+          <p class="metrics-meta">
+            Last market date: <strong id="last-market-date">--</strong>
+            <span class="meta-sep">|</span>
+            Prediction date: <strong id="prediction-date">--</strong>
+            <span class="meta-sep">|</span>
+            Sessions: <strong id="sessions-ahead">--</strong>
+          </p>
+          <div class="explain-box">
+            <h3>What this teaches</h3>
+            <p>
+              This app shows a beginner-friendly workflow: collect data, engineer features,
+              split train/test data, fit a regression model, and extend the forecast to a chosen future date.
+            </p>
+          </div>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>
