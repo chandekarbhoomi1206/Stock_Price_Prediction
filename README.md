@@ -21,6 +21,14 @@ An interactive Flask website for a data learning project. It pulls historical st
 
 ## Run locally
 
+## Important
+
+Run this command only after all dependencies are installed:
+
+```powershell
+.\.venv\Scripts\python.exe app.py
+```
+
 1. Create a virtual environment:
 
 ```powershell
