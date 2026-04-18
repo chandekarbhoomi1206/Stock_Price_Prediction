@@ -40,7 +40,7 @@ python -m venv .venv
 
 3. Only after installation is complete, run the website:
 <!-- powershell -->
- .\.venv\Scripts\python.exe app.py
+.\.venv\Scripts\python.exe app.py
 
 
 4. Open `http://127.0.0.1:5000`
