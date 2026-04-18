@@ -30,17 +30,18 @@ Run this command only after all dependencies are installed:
 Install everything first, then run the website.
 
 1. Create a virtual environment:
-<!-- powershell -->
+```powershell
 python -m venv .venv
-
+```
 
 2. Install all required packages:
-<!-- powershell -->
+```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
 3. Only after installation is complete, run the website:
-<!-- powershell -->
+```powershell
 .\.venv\Scripts\python.exe app.py
-
+```
 
 4. Open `http://127.0.0.1:5000`
