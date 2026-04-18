@@ -26,11 +26,6 @@ Run this command only after all dependencies are installed:
 .\.venv\Scripts\python.exe app.py
 ```
 
-Run this command only after all dependencies are installed:
-<!-- powershell -->
-.\.venv\Scripts\python.exe app.py
-
-
 
 Install everything first, then run the website.
 
